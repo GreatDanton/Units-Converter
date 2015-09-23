@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 import urllib.request
 from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QMainWindow, QDesktopWidget, QComboBox
@@ -23,7 +25,6 @@ class Main(QMainWindow):
         self.ui.textfield_input.textChanged.connect(self.on_text_change)
         self.ui.combo_units.activated[str].connect(self.combo_changed)
         # currency part
-
         self.ui.currency_input.textChanged.connect(self.on_text_change_currency)
         self.ui.currency_combobox.activated[str].connect(self.combo_currency_changed)
         self.ui.currencybutton_swap.setCheckable(True)
