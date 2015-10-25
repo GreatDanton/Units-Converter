@@ -14,6 +14,7 @@ Physical units supported:
 
 -oz / ml
 
+-fahrenheit / celsius
 
 Currencies supported (exchange rates are updated every time you choose option from combobox):
 
