@@ -35,7 +35,7 @@ class Main(QMainWindow):
         num_input = self.ui.textfield_input.text()
         swap_button = self.ui.button_swap
         combo_units = self.ui.combo_units
-        ratios = {1: 2.54, 2: 1.609344, 3: 0.45359237, 4: 3.78541178, 5: 29.5735296}
+        ratios = {1: 2.54, 2: 1.609344, 3: 0.45359237, 4: 3.78541178, 5: 29.5735296, 6: 1 }
         index = combo_units.currentIndex()
         if swap_button.isChecked():
 
@@ -44,9 +44,16 @@ class Main(QMainWindow):
                 return
             else:
                 ratio = ratios[index]
-                output = float(num_input) / ratio
-                output = '%.2f' % output
-                self.ui.textfield_output.setText(output)
+# converting celsius to fahrenheit
+                if index == 6:
+                    output = (float(num_input) * 9 / 5) + 32
+                    output = '%.2f' % output
+                    self.ui.textfield_output.setText(output)
+# for all other conversions
+                else:
+                    output = float(num_input) / ratio
+                    output = '%.2f' % output
+                    self.ui.textfield_output.setText(output)
         else:
 
             if len(self.ui.textfield_input.text()) == 0:
@@ -54,9 +61,16 @@ class Main(QMainWindow):
                 return
             else:
                 ratio = ratios[index]
-                output = float(num_input) * ratio
-                output = '%.2f' % output
-                self.ui.textfield_output.setText(output)
+# index 6 = code for fahrenheit to celsius
+                if index == 6:
+                    output = (float(num_input)-32) * 5 / 9
+                    output = '%.2f' % output
+                    self.ui.textfield_output.setText(output)
+# for all other conversions
+                else:
+                    output = float(num_input) * ratio
+                    output = '%.2f' % output
+                    self.ui.textfield_output.setText(output)
 
     def clear_textfields(self):
         self.ui.textfield_input.clear()
@@ -83,13 +97,12 @@ class Main(QMainWindow):
         # get index of combobox selected item:
         index = combo_units.currentIndex()
         sentence = combo_units.itemText(index)
-        combo_items = []
-        combo_items.append(sentence.split())
+        position_of_slash = sentence.find('/')
 
         # change labels to the words in combobox
         if index > 0:
-            label_from.setText(combo_items[0][0])
-            label_to.setText(combo_items[0][2])
+            label_from.setText(sentence[:position_of_slash])
+            label_to.setText(sentence[position_of_slash+2:])
         else:
             label_from.setText('From')
             label_to.setText('To')
@@ -110,8 +123,7 @@ class Main(QMainWindow):
             # get index of combobox selected item:
             index = combo_units.currentIndex()
             sentence = combo_units.itemText(index)
-            combo_items = []
-            combo_items.append(sentence.split())
+            position_of_slash = sentence.find('/')
 
             # money ratios:
             ratios = {1: ['USD', 'EUR'], 2: ['CHF', 'EUR'], 3: ['HRK', 'EUR'], 4: ['GBP', 'EUR'],
@@ -131,8 +143,8 @@ class Main(QMainWindow):
                 print(ratio)
                 config.currency_ratios[index] = ratio
                 print(config.currency_ratios)
-                label_from.setText(combo_items[0][0])
-                label_to.setText(combo_items[0][-1])
+                label_from.setText(sentence[:position_of_slash])
+                label_to.setText(sentence[position_of_slash+2:])
 
     def on_text_change_currency(self):
         num_input = self.ui.currency_input.text()
