@@ -154,17 +154,22 @@ class Main(QMainWindow):
                     input_file.close()
                     # finds the position of the correct ratio number
                     position_of_number = output_text.find(str(index)+':')
-                    # print(output_text[position_of_number+2:position_of_number+9])
-                    new_ratio = ratio
-                    final_output_text = output_text[:position_of_number+3] + str(new_ratio) + ','  \
-                            + output_text[position_of_number+10:]
-                    
-                    output_file = open('currency_ratios', 'w')
-                    output_file.write(final_output_text)
-                    print(final_output_text)
-                    output_file.close()
 
-                # if internet is not working read numbers from txt file 
+                    # if current ratio is the same as in .txt file then do nothing
+                    if ratio == output_text[position_of_number+3: position_of_number+9]:
+                        pass
+                    else:
+                        # print(output_text[position_of_number+2:position_of_number+9])
+                        new_ratio = ratio
+                        final_output_text = output_text[:position_of_number+3] + str(new_ratio) + ','  \
+                                + output_text[position_of_number+10:]
+                        
+                        output_file = open('currency_ratios', 'w')
+                        output_file.write(final_output_text)
+                        print(final_output_text)
+                        output_file.close()
+
+                # if internet is not working read numbers from .txt file 
                 except urllib.request.URLError:
                     print("Internet off")
                     input_file = open('currency_ratios', 'r')
