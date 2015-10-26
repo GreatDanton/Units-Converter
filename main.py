@@ -2,6 +2,7 @@
 
 import sys
 import urllib.request
+import os
 from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QMainWindow, QDesktopWidget, QComboBox
 from converter_gui import Ui_Widget
 import config
@@ -97,6 +98,7 @@ class Main(QMainWindow):
         # get index of combobox selected item:
         index = combo_units.currentIndex()
         sentence = combo_units.itemText(index)
+        # find position of slash from combobox
         position_of_slash = sentence.find('/')
 
         # change labels to the words in combobox
@@ -120,9 +122,10 @@ class Main(QMainWindow):
             if swap_button.isChecked():
                 swap_button.setChecked(False)
 
-            # get index of combobox selected item:
+            # get index + text of combobox selected item:
             index = combo_units.currentIndex()
             sentence = combo_units.itemText(index)
+            # find position of slash in combobox
             position_of_slash = sentence.find('/')
 
             # money ratios:
@@ -134,15 +137,46 @@ class Main(QMainWindow):
                 label_to.setText('To')
                 return
             else:
-                connection = urllib.request.urlopen("https://www.google.com/finance/converter?a=1&from="+ratios[index][0]+"&to="+ratios[index][1])
-                ratio_text = str(connection.read())
-                connection.close()
-                #print(ratio_text)
-                characters_number = ratio_text.find("class=bld")
-                ratio = float(ratio_text[characters_number+10: characters_number+16])
-                print(ratio)
-                config.currency_ratios[index] = ratio
-                print(config.currency_ratios)
+                try:
+                    connection = urllib.request.urlopen("https://www.google.com/finance/converter?a=1&from="+ratios[index][0]+"&to="+ratios[index][1], timeout = 0.5)
+
+                    ratio_text = str(connection.read())
+                    connection.close()
+                    # print(ratio_text)
+                    characters_number = ratio_text.find("class=bld")
+                    ratio = float(ratio_text[characters_number+10: characters_number+16])
+                    print(ratio)
+                    config.currency_ratios[index] = ratio
+                    print("Internet on")
+                    
+                    input_file = open('currency_ratios', 'r')
+                    output_text = input_file.read()
+                    input_file.close()
+                    # finds the position of the correct ratio number
+                    position_of_number = output_text.find(str(index)+':')
+                    # print(output_text[position_of_number+2:position_of_number+9])
+                    new_ratio = ratio
+                    final_output_text = output_text[:position_of_number+3] + str(new_ratio) + ','  \
+                            + output_text[position_of_number+10:]
+                    
+                    output_file = open('currency_ratios', 'w')
+                    output_file.write(final_output_text)
+                    print(final_output_text)
+                    output_file.close()
+
+                # if internet is not working read numbers from txt file 
+                except urllib.request.URLError:
+                    print("Internet off")
+                    input_file = open('currency_ratios', 'r')
+                    input_file_text = input_file.read()
+                    input_file.close()
+
+                    position = input_file_text.find(str(index)+':')
+                    new_ratio = float(input_file_text[position+3: position+9])
+                    config.currency_ratios[index] = new_ratio
+                    print(config.currency_ratios)
+
+                # set correct label text
                 label_from.setText(sentence[:position_of_slash])
                 label_to.setText(sentence[position_of_slash+2:])
 
